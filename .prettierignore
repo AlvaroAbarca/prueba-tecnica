@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Coverage
+coverage/
+
+# Environment files
+.env*
+
+# Logs
+*.log
+
+# Husky
+.husky/_
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

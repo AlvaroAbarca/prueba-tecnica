@@ -1,0 +1,38 @@
+import { User } from '@modules/users/domain/models/user';
+import { UserEntity } from '@modules/shared/infrastructure/entities/user.entity';
+
+export const createUserFromEntity = (entity: UserEntity) =>
+  User.create({
+    id: entity.id,
+    firstName: entity.firstName,
+    lastName: entity.lastName,
+    rut: entity.rut,
+    email: entity.email,
+    emailVerified: entity.emailVerified,
+    password: entity.password,
+    order: entity.order,
+    visible: entity.visible,
+    enabled: entity.enabled,
+    comment: entity.comment,
+    lastLoginDate: entity.lastLoginDate,
+    lastLoginIp: entity.lastLoginIp,
+    lastPasswordUpdate: entity.lastPasswordUpdate,
+    lastFailLogDate: entity.lastFailLogDate,
+    timeZoneCode: entity.timeZoneCode,
+    languageCode: entity.languageCode,
+    resetPasswordToken: entity.resetPasswordToken,
+    resetPasswordDate: entity.resetPasswordDate,
+    failedLoginAttempts: entity.failedLoginAttempts,
+    logout: entity.logout,
+    authProvider: entity.authProvider,
+    phone: entity.phone,
+    token: entity.token,
+    tokenExpiration: entity.tokenExpiration,
+    img: entity.img,
+    enable2fa: entity.enable2fa,
+    createdAt: entity.createdAt,
+    updatedAt: entity.updatedAt,
+    secret2fa: entity.secret2fa,
+    sessionToken: entity.sessionToken,
+    iata: entity.iata || 'N/A',
+  });

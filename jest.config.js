@@ -1,0 +1,102 @@
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  moduleFileExtensions: ['js', 'json', 'ts'],
+  rootDir: '.',
+  testRegex: '.*\\.spec\\.ts$',
+  transform: {
+    '^.+\\.(t|j)s$': 'ts-jest',
+  },
+  collectCoverageFrom: [
+    // Todos los módulos
+    'src/modules/**/*.ts',
+
+    // Excluir archivos sin lógica ejecutable
+    '!src/modules/**/*.spec.ts',
+    '!src/modules/**/*.test.ts',
+    '!src/modules/**/*.d.ts',
+    '!src/modules/**/*.mock.ts',
+    '!src/modules/**/*.module.ts',
+    '!src/modules/**/*.entity.ts',
+    '!src/modules/**/index.ts',
+
+    // Excluir DTOs y Swagger (sin lógica de negocio)
+    '!src/modules/**/dto/**',
+    '!src/modules/**/dtos/**',
+    '!src/modules/**/swagger/**',
+
+    // Excluir capa de dominio (interfaces, types, constants, exceptions — sin lógica ejecutable)
+    '!src/modules/**/domain/**/interfaces/**',
+    '!src/modules/**/domain/**/constants/**',
+    '!src/modules/**/domain/**/types/**',
+    '!src/modules/**/domain/**/exceptions/**',
+    '!src/modules/**/domain/**/valueObjects/**',
+    '!src/modules/**/domain/**/value-objects/**',
+
+    // Excluir infraestructura de bajo valor para tests unitarios
+    '!src/modules/**/infrastructure/guards/**',
+    '!src/modules/**/infrastructure/decorators/**',
+    '!src/modules/**/infrastructure/middleware/**',
+    '!src/modules/**/infrastructure/persistences/**',
+    '!src/modules/**/infrastructure/cache/**',
+    '!src/modules/**/infrastructure/apis/**',
+    '!src/modules/**/infrastructure/types/**',
+    '!src/modules/**/infraestructure/persistences/**',
+
+    // Excluir infraestructura que requiere integración real (HTTP, DB, WebSockets, Loggers)
+    '!src/modules/**/infrastructure/repositories/**',
+    '!src/modules/**/infraestructure/repositories/**',
+    '!src/modules/**/infrastructure/services/**',
+    '!src/modules/**/infraestructure/services/**',
+    '!src/modules/**/infrastructure/sockets/**',
+    '!src/modules/**/infrastructure/interceptors/**',
+    '!src/modules/**/infrastructure/filters/**',
+    '!src/modules/**/infrastructure/orm/**',
+    '!src/modules/**/infrastructure/queryBuilders/**',
+    '!src/modules/**/infraestructure/queryBuilders/**',
+    '!src/modules/**/infrastructure/providers/**',
+    '!src/modules/**/infraestructure/providers/**',
+    '!src/modules/**/infrastructure/jobs/**',
+    '!src/modules/**/infraestructure/jobs/**',
+    '!src/modules/**/infrastructure/controllers/**',
+    '!src/modules/**/infraestructure/controllers/**',
+    '!src/modules/**/infrastructure/repository/**',
+    '!src/modules/**/infraestructure/repository/**',
+    '!src/modules/**/infrastructure/persistenses/**',
+    '!src/modules/**/infrastructure/exceptions/**',
+    '!src/modules/**/infrastructure/geolocation/**',
+    '!src/modules/**/infrastructure/guides/**',
+    '!src/modules/**/crud/**',
+    '!src/modules/**/criteria/infrastructure/**',
+
+    // Excluir punto de entrada
+    '!src/main.ts',
+    '!src/app.module.ts',
+  ],
+  coverageDirectory: './coverage',
+  moduleNameMapper: {
+    '@modules/(.*)': '<rootDir>/src/modules/$1',
+  },
+  coverageReporters: ['text', 'text-summary', 'lcov', 'html'],
+  collectCoverage: true,
+  maxWorkers: 1,
+  forceExit: true,
+  testPathIgnorePatterns: ['/node_modules/', '/dist/', '/coverage/'],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/coverage/',
+    '/test/',
+    '/migrations/',
+    '\\.d\\.ts$',
+    '\\.spec\\.(ts|js)$',
+    '\\.test\\.(ts|js)$',
+    'e2e\\.spec\\.ts$',
+    '\\.module\\.ts$',
+    '\\.mock\\.ts$',
+    '\\.entity\\.ts$',
+    '/src/main\\.ts$',
+    '/src/app\\.module\\.ts$',
+  ],
+  coverageThreshold: {},
+};
