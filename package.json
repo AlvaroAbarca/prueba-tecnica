@@ -5,7 +5,7 @@
   "author": "CorreosChile 2026",
   "private": true,
   "engines": {
-    "node": "=22.16.0",
+    "node": ">=24 <25",
     "npm": ">=10.0.0"
   },
   "scripts": {

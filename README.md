@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <b>PostgreSQL</b> &nbsp;|&nbsp; <b>Node.js 22</b> &nbsp;|&nbsp; <b>NestJS</b>
+  <b>PostgreSQL</b> &nbsp;|&nbsp; <b>Node.js 24</b> &nbsp;|&nbsp; <b>NestJS</b>
 </p>
 
 API base en NestJS con arquitectura hexagonal. Incluye CRUD de usuarios, login local con JWT en cookies HTTP-only y autorización por roles.
@@ -53,7 +53,7 @@ Swagger queda en [http://localhost:8003/swagger](http://localhost:8003/swagger) 
 
 ## Stack
 
-- **NestJS 11** sobre **Node.js 22.16.0**
+- **NestJS 11** sobre **Node.js 24** (`.nvmrc`)
 - **TypeORM** y **PostgreSQL 17**
 - **class-validator** en los DTO de la API
 - **Winston** para logs
@@ -102,11 +102,11 @@ El módulo `users` usa la carpeta `infraestructure` (sin la segunda `r`). El res
 
 ## Desarrollo local
 
-Node tiene que ser **22.16.0** (`engines` de `package.json`). Con [nvm](https://github.com/nvm-sh/nvm):
+Node tiene que ser la **v24** de [`.nvmrc`](.nvmrc). Con [nvm](https://github.com/nvm-sh/nvm):
 
 ```bash
-nvm install 22.16.0
-nvm use 22.16.0
+nvm install
+nvm use
 npm install
 ```
 
@@ -193,7 +193,7 @@ npm run test -- --testPathPattern='createUser'
 
 ## Docker de la aplicación
 
-La imagen usa Node `22.16.0-alpine`, corre como usuario `nestjs` y escucha el `PORT` (por defecto `8003`).
+La imagen usa Node `24-alpine`, corre como usuario `nestjs` y escucha el `PORT` (por defecto `8003`).
 
 ```bash
 docker build -t app-back .

@@ -1,4 +1,4 @@
-FROM node:22.16.0-alpine AS base
+FROM node:24-alpine AS base
 
 # Etapa 1: Instalar Dependencias
 FROM base AS dependencies
