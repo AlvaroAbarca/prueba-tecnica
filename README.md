@@ -1,169 +1,215 @@
-# ARQUETIPO BACKEND
+# Arquetipo Backend
 
 <p align="center">
-  <img src="docs/assets/postgresql.svg" alt="PostgreSQL" height="40" margin="0 10px"/>
-  <img src="docs/assets/nodejs.svg" alt="Node.js" height="40" margin="0 10px"/>
-  <img src="docs/assets/nestjs.svg" alt="NestJS" height="40" margin="0 10px"/>
-  <img src="docs/assets/react.svg" alt="React" height="40" margin="0 10px"/>
-  <img src="docs/assets/nextjs.svg" alt="Next.js" height="40" margin="0 10px"/>
+  <img src="docs/assets/postgresql.svg" alt="PostgreSQL" height="40"/>
+  &nbsp;
+  <img src="docs/assets/nodejs.svg" alt="Node.js" height="40"/>
+  &nbsp;
+  <img src="docs/assets/nestjs.svg" alt="NestJS" height="40"/>
 </p>
 
 <p align="center">
-  <b>PostgreSQL</b> &nbsp;|&nbsp; <b>Node</b> &nbsp;|&nbsp; <b>Nest</b> &nbsp;|&nbsp; <b>React</b> &nbsp;|&nbsp; <b>Next</b>
+  <b>PostgreSQL</b> &nbsp;|&nbsp; <b>Node.js 22</b> &nbsp;|&nbsp; <b>NestJS</b>
 </p>
-<br/>
-<div align="justify">
-Bienvenido al proyecto base backend para nuevas aplicaciones, construido sobre el stack **PNNR** (PostgreSQL · Node · NestJS · React). Esta versión mínima usa arquitectura hexagonal: CRUD de usuarios, login local con JWT y autorización por roles.
-</div>
-<br/>
 
-Consulta la documentación en la carpeta [docs/](/docs/) para más detalles.
+API base en NestJS con arquitectura hexagonal. Incluye CRUD de usuarios, login local con JWT en cookies HTTP-only y autorización por roles.
 
-## Características principales
+La documentación de cada pieza está en [docs/](docs/).
 
-- **Login local:** Autenticación con bcrypt, JWT y cookie.
-- **Roles:** Autorización con `@RolesCan` sobre perfiles y roles persistidos.
-- **CRUD de usuarios:** Alta, consulta, edición y baja en un solo módulo hexagonal.
-- **Health:** Endpoint de estado del servicio y de la base de datos.
-- **Arquitectura hexagonal:** Dominio, aplicación e infraestructura separados.
-- **Testing:** Pruebas unitarias con Jest.
+## Qué incluye
 
-## Stack Tecnológico
+- **Login local:** email y contraseña con bcrypt. Emite access token y refresh token en cookies `access_token` y `refresh_token`.
+- **Sesión:** `FlexibleAuthGuard` acepta `Authorization: Bearer` o las cookies. Si el access token expiró y el refresh sigue válido, se renueva el par.
+- **Roles:** `@RolesCan` y `RolesGuard` leen los roles del perfil persistido.
+- **Usuarios:** alta, listado paginado, consulta por id, edición y baja lógica.
+- **Estado:** `GET /api/status` comprueba el servicio y la conexión a PostgreSQL.
+- **Arranque:** las migraciones pendientes se aplican al iniciar el proceso.
 
-- **Node.js + NestJS** – Framework principal para construir aplicaciones escalables y mantenibles
-- **TypeORM:** ORM para manejo de base de datos relacional PostgreSQL
-- **Dayjs:** Manejo de fechas
-- **Winston:** Logging a consola
-- **Jest:** Testing para pruebas de cobertura, unitarias e integración
-- **Docker:** para despliegue en contenedores
-- **Swagger:** Documentación API
-- **docs:** Carpeta para documentación del proyecto en Markdown
-- **Prettier + ESLint:** Formateo y linting de código
+## Módulos
 
----
+| Módulo | Responsabilidad |
+|--------|-----------------|
+| `auth` | Login, logout, JWT, guards y middleware de cookies |
+| `users` | Casos de uso y persistencia de usuarios, perfiles y roles |
+| `status` | Health del proceso y de la base |
+| `shared` | ORM, entidades TypeORM, filtros, logging, excepciones y utilidades |
 
-## Estructura Hexagonal (Clean Architecture)
+## Endpoints
+
+Las rutas de auth y usuarios responden tanto en la raíz como bajo `/api`. El estado solo existe en `/api`.
+
+| Método | Ruta | Acceso |
+|--------|------|--------|
+| `POST` | `/auth/login` | Público |
+| `POST` | `/auth/logout` | Autenticado |
+| `POST` | `/users` | `BACKOFFICE_USER_CREATE` |
+| `GET` | `/users` | `BACKOFFICE_USER_READ` |
+| `GET` | `/users/:id` | `BACKOFFICE_USER_READ` |
+| `PUT` | `/users` | `BACKOFFICE_USER_UPDATE` |
+| `DELETE` | `/users` | `BACKOFFICE_USER_DELETE` |
+| `GET` | `/api/status` | Público |
+
+Swagger queda en [http://localhost:8003/swagger](http://localhost:8003/swagger) cuando `NODE_ENV` no es `production`. El JSON para Postman está en `/swagger/json`.
+
+## Stack
+
+- **NestJS 11** sobre **Node.js 22.16.0**
+- **TypeORM** y **PostgreSQL 17**
+- **class-validator** en los DTO de la API
+- **Winston** para logs
+- **Jest** para tests unitarios
+- **Swagger** para la documentación de la API
+- **ESLint**, **oxlint** y **Prettier**
+
+## Estructura
 
 ```plaintext
 src/
-├── modules/                        # Módulos funcionales (ej: users, auth, correos)
-│   ├── <modulo>/                   # Cada módulo sigue la arquitectura hexagonal
-│   │   ├── application/            # Casos de uso y servicios de aplicación
-│   │   │   ├── use-cases/          # Acciones específicas del módulo
-│   │   │   └── services/           # Servicios que agrupan lógica de negocio
-│   │   ├── domain/                 # Lógica de dominio y entidades puras
-│   │   │   ├── models/             # Entidades del dominio
-│   │   │   ├── services/           # Reglas y lógica del dominio
-│   │   │   ├── dto/                # DTOs internos (sin decoradores)
-│   │   │   ├── interfaces/         # Interfaces hacia servicios externos (puertos de salida)
-│   │   │   └── value-objects/      # Objetos de valor y validación
-│   │   └── infrastructure/         # Adaptadores externos y persistencia
-│   │       ├── persistences/       # Repositorios para acceso a datos
-│   │       ├── dto/                # DTOs externos (con decoradores)
-│   │       └── controllers/        # Controladores API REST (NestJS)
-│   └── shared/                     # Utilidades y recursos comunes para todos los módulos
-│       ├── dtos/
-│       ├── interceptors/
-│       ├── filters/
-│       ├── middlewares/
-│       └── config/                 # Configuración global, Winston, .env, etc.
-│
-│
-├── main.ts                         # Punto de entrada de la aplicación
-└── app.module.ts                   # Módulo raíz de NestJS
+├── main.ts
+├── app.module.ts
+└── modules/
+    ├── auth/
+    ├── users/
+    ├── status/
+    └── shared/
+        ├── domain/
+        └── infrastructure/
+            ├── entities/          # Entidades TypeORM
+            ├── orm/
+            ├── filters/
+            └── providers/log/
 ```
 
-- **modules:** Cada módulo funcional (ej: users, auth, correos) sigue la arquitectura hexagonal.
-- **application:** Casos de uso y servicios de aplicación.
-- **domain:** Modelos, reglas de negocio, DTOs internos, interfaces y value objects.
-- **infrastructure:** Repositorios, controladores y adaptadores de persistencia.
-- **shared:** Utilidades comunes, configuración, interceptores, filtros y middlewares.
-- **docs:** Documentación técnica y funcional del proyecto.
+Cada módulo de negocio separa tres capas:
 
----
+```plaintext
+src/modules/<modulo>/
+├── application/
+│   ├── useCases/                  # Un archivo por acción: <accion>.useCase.ts
+│   └── services/
+├── domain/
+│   ├── models/                    # Modelos de dominio, no entidades TypeORM
+│   ├── interfaces/
+│   ├── valueObjects/
+│   └── dto/
+└── infrastructure/
+    ├── controllers/
+    ├── dto/                       # DTO de la API, con class-validator
+    └── persistences/
+```
 
-## Inicio de desarrollo
+El módulo `users` usa la carpeta `infraestructure` (sin la segunda `r`). El resto usa `infrastructure`.
 
-Sigue estos pasos para configurar y ejecutar el proyecto en tu entorno local siempre usando npm:
+## Desarrollo local
 
-1. **Clona el repositorio:**
+Node tiene que ser **22.16.0** (`engines` de `package.json`). Con [nvm](https://github.com/nvm-sh/nvm):
 
-   ```bash
-   git clone <URL-del-repositorio>
-   ```
+```bash
+nvm install 22.16.0
+nvm use 22.16.0
+npm install
+```
 
-2. **Verifica la versión de Node.js con NVM:**
+PostgreSQL local con Docker:
 
-   Instala [NVM](https://github.com/nvm-sh/nvm) si no lo tienes.
+```bash
+docker compose -f docker-compose-db.yml up -d
+```
 
-   Usa la versión recomendada (Node.js 22):
+Credenciales del compose:
 
-   ```bash
-   nvm install 22
-   nvm use 22
-   ```
+| | |
+|--|--|
+| Host | `localhost` |
+| Puerto | `5432` |
+| Usuario | `postgres` |
+| Contraseña | `postgres` |
+| Base | `postgres` |
 
-3. **Instala las dependencias:**
+Copia el entorno. El proceso arranca con los valores de `.env.example`; en un entorno real hay que definir secretos JWT propios (si faltan, el servicio usa `default-secret` y `default-refresh-secret`):
 
-   ```bash
-   npm install
-   ```
+```bash
+cp .env.example .env
+```
 
-4. **Configura la base de datos PostgreSQL:**
+Variables de arranque y de autenticación:
 
-   Asegúrate de tener una instancia de PostgreSQL corriendo y actualiza las variables de conexión en el archivo `.env`.
+| Variable | Uso |
+|----------|-----|
+| `PORT` | Puerto HTTP. En `.env.example` es `8003` |
+| `BD_HOST`, `BD_PORT`, `BD_USER`, `BD_PASS`, `BD_SCHEMA` | Conexión TypeORM |
+| `JWT_SECRET`, `JWT_REFRESH_SECRET` | Firma del access y del refresh token |
+| `JWT_AUDIENCE`, `JWT_ISSUER` | Claims del JWT |
+| `ACCESS_TOKEN_EXPIRES`, `REFRESH_TOKEN_EXPIRES` | Vida de cada token, en segundos |
 
-   puedes usar docker-compose-db.yml para levantar una base de datos PostgreSQL rápidamente en localhost:
+```bash
+npm run dev
+```
 
-   ```bash
-   docker compose -f docker-compose-db.yml up -d
-   ```
+El servidor queda en [http://localhost:8003](http://localhost:8003). Al arrancar aplica las migraciones pendientes. También se pueden correr a mano:
 
-   para detenerla:
+```bash
+npm run migration:run
+npm run migration:show
+```
 
-   ```bash
-   docker compose -f docker-compose-db.yml down -v
+Para bajar la base y borrar el volumen:
 
-   ```
+```bash
+docker compose -f docker-compose-db.yml down -v
+```
 
-   datos de conexión por defecto:
-   - Host: localhost
-   - Puerto: 5432
-   - Usuario: postgres
-   - Contraseña: postgres
-   - Base de datos: postgres
+### Usuario inicial
 
-5. **Configura las variables de entorno:**
+La migración `createUserAdmin` inserta un administrador:
 
-   crea el archivo `.env` con las variables de entorno.
-   Puedes basarte en el archivo `.env.example` proporcionado.
+- Email: `pedro.postal@correos.cl`
+- Contraseña: la tiene el equipo; en la base queda solo el hash
 
-6. **Inicia el proyecto en modo desarrollo:**
+### Scripts
 
-   ```bash
-   npm run dev
-   ```
+| Comando | Qué hace |
+|---------|----------|
+| `npm run dev` | Nest en watch |
+| `npm run build` | Compila a `dist/` |
+| `npm run start` | Arranca sin watch |
+| `npm run start:prod` | `node dist/src/main.js` |
+| `npm run test` | Jest con cobertura |
+| `npm run test:watch` | Jest en watch |
+| `npm run test:e2e` | Jest con `test/jest-e2e.json` |
+| `npm run lint` | ESLint |
+| `npm run lint:fix` | ESLint con `--fix` |
+| `npm run format` | Prettier |
+| `npm run migration:create <nombre>` | Crea un archivo en `migrations/` |
+| `npm run migration:run` | Aplica migraciones pendientes |
+| `npm run migration:revert` | Revierte la última |
+| `npm run migration:show` | Lista el estado |
 
-7. **Verifica que el servidor esté corriendo:**
+Un solo archivo de test:
 
-   Abre [http://localhost:8003](http://localhost:8003) en tu navegador.
+```bash
+npm run test -- --testPathPattern='createUser'
+```
 
-8. **Accede a la documentación Swagger:**
+## Docker de la aplicación
 
-   Abre [http://localhost:8003/swagger](http://localhost:8003/swagger) en tu navegador.
+La imagen usa Node `22.16.0-alpine`, corre como usuario `nestjs` y escucha el `PORT` (por defecto `8003`).
 
-## Inicio con Docker
+```bash
+docker build -t app-back .
+docker run -d --name app --env-file .env -p 8003:8003 app-back
+```
 
-1. **Construye la imagen Docker:**
-   ```bash
-   docker build -t app-back .
-   ```
-2. **Ejecuta el contenedor:**
-   ```bash
-   docker run  -d  --name app  -p 3000:3000 app-back
-   ```
+La base del compose tiene que estar accesible desde el contenedor. Con `BD_HOST=localhost` dentro del contenedor no llega al Postgres del host.
 
-3.- **Defaul user:**
+## Documentación
 
-- Email: pedro.postal@correos.cl
-- Password: consultar al equipo de desarrollo
+| Archivo | Tema |
+|---------|------|
+| [docs/authentication.md](docs/authentication.md) | Login, JWT y cookies |
+| [docs/rolesCanSystem.md](docs/rolesCanSystem.md) | `@RolesCan` y `RolesGuard` |
+| [docs/exceptions.md](docs/exceptions.md) | Excepciones de dominio |
+| [docs/migrations.md](docs/migrations.md) | Migraciones TypeORM |
+| [docs/validations.md](docs/validations.md) | Validadores y value objects |
+| [docs/modelsCreation.md](docs/modelsCreation.md) | Modelos de dominio |
+| [docs/conventions.md](docs/conventions.md) | Convenciones de código |
